@@ -63,3 +63,82 @@
  inner join order_details od on od.order_id=o.order_id
  where to_char(order_date,'YYYY')='1996'
  group by to_char(order_date,'YYYY')
+
+
+
+ -- 17-masla:Eng ko`p summadagi buyurtma qilgan 5ta haridorni topuvchi so`rov yozing (Customers, Orders
+ va Order Details)
+ select c.company_name, sum(od.unit_price*od.quantity) from  customers c
+ inner join orders o on o.customer_id=c.customer_id
+ inner join order_details od on od.order_id=o.order_id
+ group by c.company_name, od.unit_price
+ order by od.unit_price desc
+ limit 5
+
+
+-- 18-masala:Buyurtmalar soni 50tadan kam bo`lgan ishchilar haqida ma`lumotni topuvchi so`rov yozing
+ (Employees va Orders)
+ select e.last_name, count(o.order_id) from employees e
+ inner join orders o on o.employee_id=e.employee_id
+ group by e.last_name
+ having count(o.order_id)<50
+
+
+-- 19-masala:Har bir yil bo`yicha buyurtmalar sonini chop eting (Oraliq nazoratdan)
+ select to_char(order_date,'YYYY'), count(o.order_id) from orders o
+ group by to_char(order_date,'YYYY')
+
+
+
+
+-- 20-masala:1997-yil may oyida eng ko`p buyurtma qabul qilingan beshta kunni chop eting (Oraliq
+-- nazoratdan)
+ select to_char(order_date,'YYYY-MM-DD'), count(order_id) from orders
+ where to_char(order_date,'YYYY-MM')='1997-05'
+ group by to_char(order_date,'YYYY-MM-DD')
+ order by count(order_id) desc
+ limit 5
+
+
+
+
+-- 21-masala:1996-yili qaysi oyida eng ko’p mahsulot zakaz qilinganligini aniqlab beruvchi so’rov
+-- shakllantiring.
+ select to_char(order_date,'YYYY-MM'), count(order_id) from orders
+ where to_char(order_date,'YYYY')='1996'
+ group by to_char(order_date,'YYYY-MM')
+ having count(order_id)=(select  count(order_id) from orders
+ where to_char(order_date,'YYYY')='1996'
+ group by to_char(order_date,'YYYY-MM')
+ order by  count(order_id) desc limit 1)
+ order by  count(order_id) desc
+
+
+
+
+-- 22-masala:Eng ko’p buyurtma qabul qilingan 10ta kunni chop etish
+ select to_char(order_date,'YYYY-MM-DD'), count(order_id) from orders
+ where to_char(order_date,'YYYY')='1996'
+
+
+
+-- 23-masala:Vaqtida yetkazib berilgan mahsulotlarni qancha muddatda yetkazilganligi va kim tomonidan
+-- yetkazilganligi haqida ma’lumotni shakllantiring
+ select s.company_name , p.product_name, (o.shipped_date-o.order_date) from suppliers s
+ inner join products p on p.supplier_id=s.supplier_id
+ inner join order_details od on od.product_id=p.product_id
+ inner join orders o on o.order_id=od.order_id
+ where o.shipped_date<=o.required_date
+
+
+
+
+-- 24-masala:Ikki va undan ortiq buyurtma bergan haridorlar soni top 50tasini chiqarish
+ select c.company_name , count(o.order_id) from customers c
+ inner join orders o on o.customer_id=c.customer_id
+ inner join order_details od on od.order_id=o.order_id
+ group by c.company_name
+ having count(o.order_id)>=2
+ order by count(o.order_id)
+ limit 50
+
