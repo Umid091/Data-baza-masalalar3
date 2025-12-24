@@ -142,3 +142,18 @@
  order by count(o.order_id)
  limit 50
 
+
+
+ -- 25-masala:Har bir davlatdan nechta hodim borligini aniqlash so`rovini tuzish
+ select e.country,  count(e.employee_id) from employees e
+ group by   e.country
+
+
+
+-- 26-maslala:5 tadan ko’p buyurtmani o’z vaqtida yetkazib bermagan hodimlar ro’yxatini chop eting
+select e.employee_id, e.last_name, count(o.order_id) as kechikkan_buyurtmalar from employees e
+inner join orders o on o.employee_id = e.employee_id
+where o.shipped_date > o.required_date
+group by e.employee_id, e.last_name
+having count(o.order_id) > 5;
+
