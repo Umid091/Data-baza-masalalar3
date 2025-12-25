@@ -157,3 +157,49 @@ where o.shipped_date > o.required_date
 group by e.employee_id, e.last_name
 having count(o.order_id) > 5;
 
+
+-- 27-masala:10 tadan ko’p sotilgan mahsulotlar va hodimlar haqida ma’lumot
+ select last_name, first_name, product_name, sum(od.quantity) from employees  e
+ inner join orders o on o.employee_id=e.employee_id
+ inner join order_details od on od.order_id=o.order_id
+ inner join products p on p.product_id=od.product_id
+ group by last_name,first_name,product_name
+ having sum(od.quantity)>10
+
+
+-- 28-masala:	20 tadan ortiq mijozga (customer) ega bo’lgan davlatlar ro’yxatini chiqarib beruvchi so’rov
+-- shakllantiring
+ select country, count(customer_id) from customers
+ group by country
+
+
+
+-- 29-masala:Eng ko’p zakazni amalga oshirgan hodimlar haqida ma’lumot shakllantiring
+select last_name,first_name, count(order_id) from employees e
+ inner join orders o on o.employee_id=e.employee_id
+ group by last_name,first_name
+ having  count(order_id)=any(select  count(o.order_id) from employees e
+ inner join orders o on o.employee_id=e.employee_id
+ group by last_name
+ order by count(order_id) desc limit 1)
+
+
+-- 30-masala: 3 tadan ko’p buyurtmani o’z vaqtida yetkazib bermagan hodimlar ro’yhatini shakllantiring
+ select e.employee_id, e.first_name, e.last_name,count(o.order_id) from employees e
+ inner join orders o on o.employee_id = e.employee_id
+ where o.shipped_date > o.required_date
+ group by e.employee_id, e.first_name, e.last_name
+ having count(o.order_id) > 3;
+
+
+
+-- 31-masala:Amerikada yashovchi eng faol xodimlar haqida ma'lumot shakllantirin
+ select last_name, first_name, count(o.order_id) from employees e
+ inner join orders o on o.employee_id=e.employee_id
+ where e.country='USA'
+ group by last_name, first_name
+ order by count(o.order_id) desc
+ limit 1
+
+
+
